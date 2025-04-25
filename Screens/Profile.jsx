@@ -1,39 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, Button } from 'react-native';
-import { FIRESTORE_DB, FIREBASE_AUTH, storage } from '../backend/FirebaseConfig';
+import { View, Text, TextInput, Image, Button, Alert, ActivityIndicator } from 'react-native';
+import { FIRESTORE_DB, FIREBASE_AUTH } from '../backend/FirebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
-
-
-import axios from 'axios';
-
-const uploadToCloudinary = async (imageUri) => {
-  const data = new FormData();
-  data.append('file', {
-    uri: imageUri,
-    type: 'image/jpeg',
-    name: 'profile.jpg',
-  });
-  data.append('upload_preset', 'profile_preset'); // Get this from Cloudinary Settings
-  data.append('cloud_name', 'ddepyodi7');
-
-  try {
-    const res = await axios.post(
-      'https://api.cloudinary.com/v1_1/ddepyodi7/image/upload',
-      data,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
-    return res.data.secure_url;
-  } catch (err) {
-    console.error('Cloudinary upload error:', err);
-    return null;
-  }
-};
+import { uploadToCloudinary } from '../backend/cloudinary';
 
 export default function Profile() {
   const [userData, setUserData] = useState({
@@ -41,120 +11,182 @@ export default function Profile() {
     lastName: '',
     email: '',
     phone: '',
-    photoURL: '', // Store the photo URL from Firebase Storage
+    location: '',
+    photoURL: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [imagePicked, setImagePicked] = useState(false); // Track if the user has selected an image
+  const [isUploading, setIsUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const uid = FIREBASE_AUTH.currentUser?.uid;
 
-  // Fetch user data from Firestore
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission required', 'Please allow access to your gallery to upload profile pictures.');
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
-      if (uid) {
-        const docRef = doc(FIRESTORE_DB, 'accounts', uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
-        }
+      if (!uid) return;
+  
+      let profileDocRef;
+      let profileDocSnap;
+  
+      // Try fetching from accounts_worker
+      profileDocRef = doc(FIRESTORE_DB, 'accounts_worker', uid);
+      profileDocSnap = await getDoc(profileDocRef);
+  
+      if (profileDocSnap.exists()) {
+        setUserData((prev) => ({
+          ...prev,
+          ...profileDocSnap.data(),
+          role: 'worker',
+          photoURL: profileDocSnap.data().photoURL || prev.photoURL,
+        }));
+        setLoading(false);
+        return;
       }
+  
+      // Try fetching from accounts_employer if not found in accounts_worker
+      profileDocRef = doc(FIRESTORE_DB, 'accounts_employer', uid);
+      profileDocSnap = await getDoc(profileDocRef);
+  
+      if (profileDocSnap.exists()) {
+        setUserData((prev) => ({
+          ...prev,
+          ...profileDocSnap.data(),
+          role: 'employer',
+          photoURL: profileDocSnap.data().photoURL || prev.photoURL,
+        }));
+      } else {
+        console.log('No user profile found in either collection');
+      }
+  
+      setLoading(false);
     };
+  
     fetchData();
   }, [uid]);
 
-  // Handle saving user data (including the uploaded image)
   const handleSave = async () => {
-    if (uid) {
-      const updatedUserData = {
+
+    try {
+      // Update the profile data based on the role
+      let updatedUserData = {
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
-        photoURL: userData.photoURL || '', // Ensure photoURL is saved if uploaded
+        location: userData.location,
+        photoURL: userData.photoURL,
       };
 
-      const userRef = doc(FIRESTORE_DB, 'accounts', uid);
-      await updateDoc(userRef, updatedUserData);
+      if (userData.role === 'worker') {
+        await updateDoc(doc(FIRESTORE_DB, 'accounts_worker', uid), updatedUserData);
+      } else if (userData.role === 'employer') {
+        await updateDoc(doc(FIRESTORE_DB, 'accounts_employer', uid), updatedUserData);
+      }
+
       setIsEditing(false);
-      alert('Profile updated successfully');
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Something went wrong while updating your profile.');
     }
   };
 
-  // Handle image upload and update profile picture
   const pickImage = async () => {
+    console.log("Upload button clicked");
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission required', 'Please allow access to your gallery to upload profile pictures.');
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: [ImagePicker.MediaType.Image], 
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.5,
-      });   
-  
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
     if (!result.canceled) {
       const image = result.assets[0];
+      setIsUploading(true);
       const uploadedUrl = await uploadToCloudinary(image.uri);
-  
+      setIsUploading(false);
+
       if (uploadedUrl) {
-        setUserData({ ...userData, photoURL: uploadedUrl });
-        console.log('Uploaded Image URL:', uploadedUrl);
-        setImagePicked(true);
+        setUserData((prev) => ({
+          ...prev,
+          photoURL: uploadedUrl,  // Ensure this updates the photoURL
+        }));
+      } else {
+        Alert.alert('Upload Failed', 'Failed to upload image. Try again.');
       }
     }
   };
 
   return (
     <View className="flex-1 items-center justify-center bg-white p-6">
-      {/* Show the profile picture */}
-      <Image
-            source={{
-                uri: userData.photoURL && userData.photoURL !== '' 
-                ? userData.photoURL 
-                : 'https://res.cloudinary.com/ddepyodi7/image/upload/v1745331673/placeholder_quings.png',
-            }}
-            className="w-24 h-24 rounded-full mb-4"
-            resizeMode="cover"
-            />
-
-      {isEditing ? (
-        <>
-          {/* Allow user to upload an image */}
-          <Button title="Upload Profile Picture" onPress={pickImage} color="#4b5563" />
-
-          {/* Profile edit inputs */}
-          <TextInput
-            className="w-11/12 border border-gray-300 rounded-lg p-3 mb-2"
-            value={userData.firstName}
-            onChangeText={(text) => setUserData({ ...userData, firstName: text })}
-            placeholder="First Name"
-          />
-          <TextInput
-            className="w-11/12 border border-gray-300 rounded-lg p-3 mb-2"
-            value={userData.lastName}
-            onChangeText={(text) => setUserData({ ...userData, lastName: text })}
-            placeholder="Last Name"
-          />
-          <TextInput
-            className="w-11/12 border border-gray-300 rounded-lg p-3 mb-4"
-            value={userData.phone}
-            onChangeText={(text) => setUserData({ ...userData, phone: text })}
-            placeholder="Phone Number"
-            keyboardType="phone-pad"
-          />
-          <Button title="Save" onPress={handleSave} color="#1e40af" />
-        </>
+      {loading ? (
+        <ActivityIndicator size="large" color="#4b5563" className="mb-4" />
       ) : (
         <>
-          {/* Display user information */}
-          <Text className="text-lg font-semibold mb-1">
-            Full Name: {userData.firstName} {userData.lastName}
-          </Text>
-          <Text className="text-base mb-1">Email: {userData.email}</Text>
-          <Text className="text-base mb-4">Phone: {userData.phone}</Text>
+          {isUploading ? (
+            <ActivityIndicator size="large" color="#4b5563" className="mb-4" />
+          ) : (
+            <Image
+              source={{ uri: userData.photoURL || "https://res.cloudinary.com/ddepyodi7/image/upload/v1745331673/placeholder_quings.png" }}
+              className="w-24 h-24 rounded-full mb-4"
+              resizeMode="cover"
+            />
+          )}
 
-          {/* Button to edit profile */}
-          <Button
-            title="Edit"
-            onPress={() => setIsEditing(true)}
-            color="#4b5563"
-          />
+          {isEditing ? (
+            <>
+              <Button title="Upload Profile Picture" onPress={pickImage} color="#4b5563" />
+              <TextInput
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-2"
+                value={userData.firstName}
+                onChangeText={(text) => setUserData({ ...userData, firstName: text })}
+                placeholder="First Name"
+              />
+              <TextInput
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-2"
+                value={userData.lastName}
+                onChangeText={(text) => setUserData({ ...userData, lastName: text })}
+                placeholder="Last Name"
+              />
+              <TextInput
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-4"
+                value={userData.phone}
+                onChangeText={(text) => setUserData({ ...userData, phone: text })}
+                placeholder="Phone Number"
+                keyboardType="phone-pad"
+              />
+              <TextInput
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-4"
+                value={userData.location}
+                onChangeText={(text) => setUserData({ ...userData, location: text })}
+                placeholder="Location"
+              />
+              <Button title="Save" onPress={handleSave} color="#1e40af" />
+            </>
+          ) : (
+            <>
+              <Text className="text-lg font-semibold mb-1">
+                Full Name: {userData.firstName} {userData.lastName}
+              </Text>
+              <Text className="text-base mb-1">Email: {userData.email}</Text>
+              <Text className="text-base mb-1">Location: {userData.location}</Text>
+              <Text className="text-base mb-4">Phone: {userData.phone}</Text>
+              <Button title="Edit" onPress={() => setIsEditing(true)} color="#4b5563" />
+            </>
+          )}
         </>
       )}
     </View>

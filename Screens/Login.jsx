@@ -6,36 +6,47 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Handle login
   const handleLogin = async () => {
     try {
       const { user, userData } = await loginUser({ email, password });
-
-      // Navigate to Welcome screen and pass user info as params
-      navigation.replace('Welcome', {
-        firstName: userData?.firstName || '',
-        lastName: userData?.lastName || '',
-        email: user.email,
-      });
+  
+      const role = userData?.role;
+  
+      if (role === 'worker') {
+        navigation.replace('Worker', {
+          firstName: userData?.firstName || '',
+          lastName: userData?.lastName || '',
+          email: user.email,
+        });
+      } else if (role === 'employer') {
+        navigation.replace('Employer', {
+          firstName: userData?.firstName || '',
+          lastName: userData?.lastName || '',
+          email: user.email,
+        });
+      } else {
+        Alert.alert("Login Error", "User role not found. Please contact support.");
+      }
     } catch (error) {
       Alert.alert("Login Error", error.message);
     }
   };
+  
 
   return (
-    <View style={{ padding: 20, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View className="flex-1 justify-center items-center p-5">
       <TextInput
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        style={{ width: '100%', padding: 10, marginBottom: 10, borderWidth: 1 }}
+        className="w-full p-3 mb-3 border border-gray-300 rounded"
       />
       <TextInput
         placeholder="Password"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
-        style={{ width: '100%', padding: 10, marginBottom: 20, borderWidth: 1 }}
+        className="w-full p-3 mb-5 border border-gray-300 rounded"
       />
       <Button title="Login" onPress={handleLogin} />
     </View>

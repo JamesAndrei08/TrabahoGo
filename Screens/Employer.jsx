@@ -3,7 +3,7 @@ import { View, Text, Button } from 'react-native';
 import { FIREBASE_AUTH } from '../backend/FirebaseConfig';
 import { signOut } from 'firebase/auth';
 
-export default function Welcome({ route, navigation }) {
+export default function Employer({ route, navigation }) {
   const { firstName, lastName, email } = route.params;
 
   const handleLogout = async () => {
@@ -22,7 +22,7 @@ export default function Welcome({ route, navigation }) {
   return (
     <View className="p-5 flex-1 justify-center items-center">
       <Text className="text-2xl font-bold">
-        Welcome, {firstName} {lastName}!
+        Welcome employer, {firstName} {lastName}! 
       </Text>
       <Text className="text-lg mt-2">{email}</Text>
       <Button title="Logout" onPress={handleLogout} />
