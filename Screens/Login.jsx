@@ -31,7 +31,6 @@ export default function LoginScreen({ navigation }) {
       Alert.alert("Login Error", error.message);
     }
   };
-  
 
   return (
     <View className="flex-1 justify-center items-center p-5">
@@ -49,6 +48,7 @@ export default function LoginScreen({ navigation }) {
         className="w-full p-3 mb-5 border border-gray-300 rounded"
       />
       <Button title="Login" onPress={handleLogin} />
+      <Button title="Forgot Password?" onPress={ () => navigation.navigate('ForgotPass')} color="#1e40af" />
     </View>
   );
 }

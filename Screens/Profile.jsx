@@ -13,6 +13,8 @@ export default function Profile() {
     phone: '',
     location: '',
     photoURL: '',
+    aboutMe: '',
+    role: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -32,55 +34,47 @@ export default function Profile() {
   useEffect(() => {
     const fetchData = async () => {
       if (!uid) return;
-  
-      let profileDocRef;
-      let profileDocSnap;
-  
-      // Try fetching from accounts_worker
-      profileDocRef = doc(FIRESTORE_DB, 'accounts_worker', uid);
-      profileDocSnap = await getDoc(profileDocRef);
-  
+
+      let profileDocRef = doc(FIRESTORE_DB, 'accounts_worker', uid);
+      let profileDocSnap = await getDoc(profileDocRef);
+
       if (profileDocSnap.exists()) {
         setUserData((prev) => ({
           ...prev,
           ...profileDocSnap.data(),
           role: 'worker',
-          photoURL: profileDocSnap.data().photoURL || prev.photoURL,
         }));
         setLoading(false);
         return;
       }
-  
-      // Try fetching from accounts_employer if not found in accounts_worker
+
       profileDocRef = doc(FIRESTORE_DB, 'accounts_employer', uid);
       profileDocSnap = await getDoc(profileDocRef);
-  
+
       if (profileDocSnap.exists()) {
         setUserData((prev) => ({
           ...prev,
           ...profileDocSnap.data(),
           role: 'employer',
-          photoURL: profileDocSnap.data().photoURL || prev.photoURL,
         }));
       } else {
         console.log('No user profile found in either collection');
       }
-  
+
       setLoading(false);
     };
-  
+
     fetchData();
   }, [uid]);
 
   const handleSave = async () => {
-
     try {
-      // Update the profile data based on the role
-      let updatedUserData = {
+      const updatedUserData = {
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
         location: userData.location,
+        aboutMe: userData.aboutMe,
         photoURL: userData.photoURL,
       };
 
@@ -99,7 +93,6 @@ export default function Profile() {
   };
 
   const pickImage = async () => {
-    console.log("Upload button clicked");
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert('Permission required', 'Please allow access to your gallery to upload profile pictures.');
@@ -122,7 +115,7 @@ export default function Profile() {
       if (uploadedUrl) {
         setUserData((prev) => ({
           ...prev,
-          photoURL: uploadedUrl,  // Ensure this updates the photoURL
+          photoURL: uploadedUrl,
         }));
       } else {
         Alert.alert('Upload Failed', 'Failed to upload image. Try again.');
@@ -140,7 +133,7 @@ export default function Profile() {
             <ActivityIndicator size="large" color="#4b5563" className="mb-4" />
           ) : (
             <Image
-              source={{ uri: userData.photoURL || "https://res.cloudinary.com/ddepyodi7/image/upload/v1745331673/placeholder_quings.png" }}
+              source={{ uri: userData.photoURL || 'https://res.cloudinary.com/ddepyodi7/image/upload/v1745331673/placeholder_quings.png' }}
               className="w-24 h-24 rounded-full mb-4"
               resizeMode="cover"
             />
@@ -162,17 +155,24 @@ export default function Profile() {
                 placeholder="Last Name"
               />
               <TextInput
-                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-4"
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-2"
                 value={userData.phone}
                 onChangeText={(text) => setUserData({ ...userData, phone: text })}
                 placeholder="Phone Number"
                 keyboardType="phone-pad"
               />
               <TextInput
-                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-4"
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-2"
                 value={userData.location}
                 onChangeText={(text) => setUserData({ ...userData, location: text })}
                 placeholder="Location"
+              />
+              <TextInput
+                className="w-11/12 border border-gray-300 rounded-lg p-3 mb-4"
+                value={userData.aboutMe}
+                onChangeText={(text) => setUserData({ ...userData, aboutMe: text })}
+                placeholder="About Me"
+                multiline
               />
               <Button title="Save" onPress={handleSave} color="#1e40af" />
             </>
@@ -183,7 +183,8 @@ export default function Profile() {
               </Text>
               <Text className="text-base mb-1">Email: {userData.email}</Text>
               <Text className="text-base mb-1">Location: {userData.location}</Text>
-              <Text className="text-base mb-4">Phone: {userData.phone}</Text>
+              <Text className="text-base mb-1">Phone: {userData.phone}</Text>
+              <Text className="text-base italic mb-4">About Me: {userData.aboutMe || 'No bio yet.'}</Text>
               <Button title="Edit" onPress={() => setIsEditing(true)} color="#4b5563" />
             </>
           )}
