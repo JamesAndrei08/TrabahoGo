@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, Text, Pressable } from 'react-native';
+import { 
+  View, 
+  TextInput, 
+  Text, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  ScrollView,
+  StatusBar
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { registerUser } from '../backend/firebaseAuth';
 
 export default function RegisterScreen({ navigation }) {
@@ -11,90 +20,276 @@ export default function RegisterScreen({ navigation }) {
   const [role, setRole] = useState(null);
   const [location, setLocation] = useState('');
 
+
+  const PURPLE = '#613DC1';
+  const GRAY = '#64748B';
+  const LIGHT_GRAY = '#e5e7eb';
+
   const handleRegister = async () => {
     if (!role) {
-      Alert.alert("Select Role", "Please select a role before registering.");
+      alert("Please select a role before registering.");
       return;
     }
 
     try {
       await registerUser({ email, password, firstName, lastName, phone, role, location });
       navigation.replace('Login');
-      Alert.alert("Success", "Account created successfully. Please log in.");
+      alert("Account created successfully. Please log in.");
     } catch (error) {
-      Alert.alert("Registration Error", error.message);
+      alert("Registration Error: " + error.message);
     }
   };
 
   return (
-    <View className="flex-1 justify-center items-center px-5 bg-white">
-      <TextInput
-        placeholder="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-        className="w-full p-3 mb-3 border border-gray-300 rounded-md"
-      />
-      <TextInput
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-        className="w-full p-3 mb-3 border border-gray-300 rounded-md"
-      />
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        className="w-full p-3 mb-3 border border-gray-300 rounded-md"
-      />
-      <TextInput
-        placeholder="Phone Number"
-        value={phone}
-        onChangeText={setPhone}
-        className="w-full p-3 mb-3 border border-gray-300 rounded-md"
-      />
-      <TextInput
-        placeholder="Location"
-        value={location}
-        onChangeText={setLocation}
-        className="w-full p-3 mb-3 border border-gray-300 rounded-md"
-      />
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        className="w-full p-3 mb-5 border border-gray-300 rounded-md"
-      />
-
-      {/* Role Selection */}
-      <View className="flex-row mb-5">
-        <Pressable
-          onPress={() => setRole('worker')}
-          className={`px-4 py-2 rounded-md mr-3 ${
-            role === 'worker' ? 'bg-green-500' : 'bg-gray-300'
-          }`}
-        >
-          <Text className="text-white font-semibold">Worker</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setRole('employer')}
-          className={`px-4 py-2 rounded-md ${
-            role === 'employer' ? 'bg-blue-500' : 'bg-gray-300'
-          }`}
-        >
-          <Text className="text-white font-semibold">Employer</Text>
-        </Pressable>
+    <View style={{ flex: 1, backgroundColor: PURPLE }}>
+      <StatusBar barStyle="light-content" backgroundColor={PURPLE} />
+   
+      <View style={{ 
+        paddingHorizontal: 40,
+        paddingTop: 70,
+        paddingBottom: 50
+      }}>
+        <Text style={{ 
+          color: 'white', 
+          fontSize: 28, 
+          fontWeight: 'bold', 
+          lineHeight: 36 
+        }}>
+          Go ahead and create
+        </Text>
+        <Text style={{ 
+          color: 'white', 
+          fontSize: 28, 
+          fontWeight: 'bold', 
+          lineHeight: 36 
+        }}>
+          your account
+        </Text>
       </View>
-
-      <Button title="Register" onPress={handleRegister} />
-
-      {/* Already have an account? */}
-      <View className="mt-6 flex-row">
-        <Text>Already have an account? </Text>
-        <Pressable onPress={() => navigation.navigate('Login')}>
-          <Text className="text-blue-600 font-semibold">Login</Text>
-        </Pressable>
+      
+      <View style={{ 
+        flex: 1, 
+        backgroundColor: 'white', 
+        borderTopLeftRadius: 32, 
+        borderTopRightRadius: 32,
+        paddingHorizontal: 30,
+        paddingTop: 30,
+      
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: -3,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4
+      }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* First Name */}
+          <View style={inputContainerStyle}>
+            <Icon
+              name="person-outline"
+              size={22}
+              color={PURPLE}
+              style={{ marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              style={inputStyle}
+              placeholderTextColor="#9ca3af"
+            />
+          </View>
+          
+          {/* Last Name */}
+          <View style={inputContainerStyle}>
+            <Icon
+              name="person-outline"
+              size={22}
+              color={PURPLE}
+              style={{ marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+              style={inputStyle}
+              placeholderTextColor="#9ca3af"
+            />
+          </View>
+          
+          {/* Email */}
+          <View style={inputContainerStyle}>
+            <Icon
+              name="mail-outline"
+              size={22}
+              color={PURPLE}
+              style={{ marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              style={inputStyle}
+              placeholderTextColor="#9ca3af"
+            />
+          </View>
+          
+          {/* Phone */}
+          <View style={inputContainerStyle}>
+            <Icon
+              name="smartphone"
+              size={22}
+              color={PURPLE}
+              style={{ marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="Cellphone Number"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              style={inputStyle}
+              placeholderTextColor="#9ca3af"
+            />
+          </View>
+          
+          {/* Location */}
+          <View style={inputContainerStyle}>
+            <Icon
+              name="location-on"
+              size={22}
+              color={PURPLE}
+              style={{ marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="Location"
+              value={location}
+              onChangeText={setLocation}
+              style={inputStyle}
+              placeholderTextColor="#9ca3af"
+            />
+          </View>
+          
+          {/* Password */}
+          <View style={inputContainerStyle}>
+            <Icon
+              name="lock-outline"
+              size={22}
+              color={PURPLE}
+              style={{ marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              style={inputStyle}
+              placeholderTextColor="#9ca3af"
+            />
+          </View>
+          
+          {/* Role Selection */}
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'center', 
+            marginVertical: 24,
+          }}>
+            <TouchableOpacity
+              onPress={() => setRole('worker')}
+              style={{
+                borderWidth: 1,
+                borderRadius: 24,
+                paddingVertical: 10,
+                paddingHorizontal: 24,
+                marginHorizontal: 8,
+                borderColor: role === 'worker' ? PURPLE : LIGHT_GRAY,
+                backgroundColor: 'white'
+              }}
+            >
+              <Text style={{ 
+                color: role === 'worker' ? PURPLE : GRAY,
+                fontWeight: role === 'worker' ? '500' : 'normal'
+              }}>
+                Worker
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              onPress={() => setRole('employer')}
+              style={{
+                borderWidth: 1,
+                borderRadius: 24,
+                paddingVertical: 10,
+                paddingHorizontal: 24,
+                marginHorizontal: 8,
+                borderColor: role === 'employer' ? PURPLE : LIGHT_GRAY,
+                backgroundColor: 'white'
+              }}
+            >
+              <Text style={{ 
+                color: role === 'employer' ? PURPLE : GRAY,
+                fontWeight: role === 'employer' ? '500' : 'normal'
+              }}>
+                Employer
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          {/* Register Button */}
+          <TouchableOpacity
+            onPress={handleRegister}
+            style={{
+              backgroundColor: PURPLE,
+              borderRadius: 28,
+              paddingVertical: 16,
+              marginVertical: 16
+            }}
+          >
+            <Text style={{ 
+              color: 'white', 
+              textAlign: 'center', 
+              fontWeight: '500', 
+              fontSize: 16 
+            }}>
+              Register
+            </Text>
+          </TouchableOpacity>
+          
+          {/* Login Link */}
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'center', 
+            marginTop: 20,
+            marginBottom: 40
+          }}>
+            <Text style={{ color: GRAY, fontSize: 15 }}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={{ color: PURPLE, fontWeight: '500', fontSize: 15 }}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
 }
+
+// Styles
+const inputContainerStyle = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: 'white',
+  borderRadius: 30,
+  paddingHorizontal: 16,
+  marginBottom: 12,
+  borderWidth: 1,
+  borderColor: '#e5e7eb',
+  height: 56
+};
+
+const inputStyle = {
+  flex: 1,
+  paddingVertical: 12,
+  color: '#333'
+};
