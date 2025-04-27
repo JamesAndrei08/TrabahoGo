@@ -1,24 +1,19 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  TextInput, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView,
-  StatusBar,
-  ScrollView
+import { View, TextInput, Text, TouchableOpacity, SafeAreaView, StatusBar,ScrollView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { loginUser } from '../backend/firebaseAuth';
+import { useNavigation } from '@react-navigation/native';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-
+  
   const PURPLE = '#613DC1';
   const GRAY = '#64748B';
-
+  
   const handleLogin = async () => {
     try {
       const { user, userData } = await loginUser({ email, password });
@@ -30,12 +25,17 @@ export default function LoginScreen({ navigation }) {
           firstName: userData?.firstName || '',
           lastName: userData?.lastName || '',
           email: user.email,
+          location: userData?.location || '',
+          phone: userData?.phone || '',
+          // Add any other fields you want to display in Profile
         });
       } else if (role === 'employer') {
         navigation.replace('Employer', {
           firstName: userData?.firstName || '',
           lastName: userData?.lastName || '',
           email: user.email,
+          location: userData?.location || '',
+          phone: userData?.phone || '',
         });
       } else {
         alert("User role not found. Please contact support.");
@@ -44,54 +44,24 @@ export default function LoginScreen({ navigation }) {
       alert("Login Error: " + error.message);
     }
   };
-
+  
   return (
-    <View style={{ flex: 1, backgroundColor: PURPLE }}>
+    <View className="flex-1 bg-[#613DC1]">
       <StatusBar barStyle="light-content" backgroundColor={PURPLE} />
       
-      <View style={{ 
-        paddingHorizontal: 40,
-        paddingTop: 70,
-        paddingBottom: 50
-      }}>
-        <Text style={{ 
-          color: 'white', 
-          fontSize: 28, 
-          fontWeight: 'bold', 
-          lineHeight: 36 
-        }}>
+      <View className="px-10 pt-[70px] pb-[50px]">
+        <Text className="text-white text-[28px] font-bold leading-9">
           Go ahead and set up
         </Text>
-        <Text style={{ 
-          color: 'white', 
-          fontSize: 28, 
-          fontWeight: 'bold', 
-          lineHeight: 36 
-        }}>
+        <Text className="text-white text-[28px] font-bold leading-9">
           your account
         </Text>
       </View>
       
-      <View style={{ 
-        flex: 1, 
-        backgroundColor: 'white', 
-        borderTopLeftRadius: 32, 
-        borderTopRightRadius: 32,
-        paddingHorizontal: 30,
-        paddingTop: 30,
-     
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: -3,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4
-      }}>
+      <View className="flex-1 bg-white rounded-t-3xl px-8 pt-8 shadow-md">
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Email Input */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="mail-outline"
               size={22}
@@ -103,13 +73,13 @@ export default function LoginScreen({ navigation }) {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Password Input */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="lock-outline"
               size={22}
@@ -121,45 +91,27 @@ export default function LoginScreen({ navigation }) {
               secureTextEntry
               value={password}
               onChangeText={setPassword}
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Remember Me & Forgot Password */}
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            marginVertical: 20
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View className="flex-row justify-between items-center my-5">
+            <View className="flex-row items-center">
               <TouchableOpacity
                 onPress={() => setRememberMe(!rememberMe)}
-                style={{
-                  width: 18,
-                  height: 18,
-                  borderWidth: 1,
-                  borderColor: GRAY,
-                  marginRight: 8,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
+                className="w-[18px] h-[18px] border border-[#64748B] mr-2 justify-center items-center"
               >
                 {rememberMe && (
-                  <View style={{
-                    width: 10,
-                    height: 10,
-                    backgroundColor: PURPLE,
-                    borderRadius: 1
-                  }} />
+                  <View className="w-[10px] h-[10px] bg-[#613DC1] rounded-sm" />
                 )}
               </TouchableOpacity>
-              <Text style={{ color: GRAY, fontSize: 14 }}>Remember me</Text>
+              <Text className="text-[#64748B] text-sm">Remember me</Text>
             </View>
             
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPass')}>
-              <Text style={{ color: PURPLE, fontWeight: '500', fontSize: 14 }}>
+              <Text className="text-[#613DC1] font-medium text-sm">
                 Forgot Password?
               </Text>
             </TouchableOpacity>
@@ -168,34 +120,18 @@ export default function LoginScreen({ navigation }) {
           {/* Login Button */}
           <TouchableOpacity
             onPress={handleLogin}
-            style={{
-              backgroundColor: PURPLE,
-              borderRadius: 28,
-              paddingVertical: 16,
-              marginTop: 20,
-              marginBottom: 16
-            }}
+            className="bg-[#613DC1] rounded-full py-4 mt-5 mb-4"
           >
-            <Text style={{ 
-              color: 'white', 
-              textAlign: 'center', 
-              fontWeight: '500', 
-              fontSize: 16 
-            }}>
+            <Text className="text-white text-center font-medium text-base">
               Login
             </Text>
           </TouchableOpacity>
           
           {/* Sign Up Link */}
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            marginTop: 20,
-            marginBottom: 40
-          }}>
-            <Text style={{ color: GRAY, fontSize: 15 }}>Don't have an account? </Text>
+          <View className="flex-row justify-center mt-5 mb-10">
+            <Text className="text-[#64748B] text-[15px]">Don't have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={{ color: PURPLE, fontWeight: '500', fontSize: 15 }}>Sign up</Text>
+              <Text className="text-[#613DC1] font-medium text-[15px]">Sign up</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -203,22 +139,3 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
-
-// Styles
-const inputContainerStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: 'white',
-  borderRadius: 30,
-  paddingHorizontal: 16,
-  marginBottom: 12,
-  borderWidth: 1,
-  borderColor: '#e5e7eb',
-  height: 56
-};
-
-const inputStyle = {
-  flex: 1,
-  paddingVertical: 12,
-  color: '#333'
-};

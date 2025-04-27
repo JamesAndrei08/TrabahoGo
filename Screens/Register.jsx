@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  TextInput, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  ScrollView,
-  StatusBar
+import { View, TextInput, Text, TouchableOpacity, SafeAreaView, ScrollView, StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { registerUser } from '../backend/firebaseAuth';
+import { useNavigation } from '@react-navigation/native';
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen() {
+  const navigation = useNavigation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,8 +14,7 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(null);
   const [location, setLocation] = useState('');
-
-
+  
   const PURPLE = '#613DC1';
   const GRAY = '#64748B';
   const LIGHT_GRAY = '#e5e7eb';
@@ -30,7 +24,6 @@ export default function RegisterScreen({ navigation }) {
       alert("Please select a role before registering.");
       return;
     }
-
     try {
       await registerUser({ email, password, firstName, lastName, phone, role, location });
       navigation.replace('Login');
@@ -41,52 +34,22 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: PURPLE }}>
+    <View className="flex-1 bg-[#613DC1]">
       <StatusBar barStyle="light-content" backgroundColor={PURPLE} />
    
-      <View style={{ 
-        paddingHorizontal: 40,
-        paddingTop: 70,
-        paddingBottom: 50
-      }}>
-        <Text style={{ 
-          color: 'white', 
-          fontSize: 28, 
-          fontWeight: 'bold', 
-          lineHeight: 36 
-        }}>
+      <View className="px-10 pt-[70px] pb-[50px]">
+        <Text className="text-white text-[28px] font-bold leading-9">
           Go ahead and create
         </Text>
-        <Text style={{ 
-          color: 'white', 
-          fontSize: 28, 
-          fontWeight: 'bold', 
-          lineHeight: 36 
-        }}>
+        <Text className="text-white text-[28px] font-bold leading-9">
           your account
         </Text>
       </View>
       
-      <View style={{ 
-        flex: 1, 
-        backgroundColor: 'white', 
-        borderTopLeftRadius: 32, 
-        borderTopRightRadius: 32,
-        paddingHorizontal: 30,
-        paddingTop: 30,
-      
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: -3,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4
-      }}>
+      <View className="flex-1 bg-white rounded-t-3xl px-8 pt-8 shadow-md">
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* First Name */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="person-outline"
               size={22}
@@ -97,13 +60,13 @@ export default function RegisterScreen({ navigation }) {
               placeholder="First Name"
               value={firstName}
               onChangeText={setFirstName}
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Last Name */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="person-outline"
               size={22}
@@ -114,13 +77,13 @@ export default function RegisterScreen({ navigation }) {
               placeholder="Last Name"
               value={lastName}
               onChangeText={setLastName}
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Email */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="mail-outline"
               size={22}
@@ -132,13 +95,13 @@ export default function RegisterScreen({ navigation }) {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Phone */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="smartphone"
               size={22}
@@ -150,13 +113,13 @@ export default function RegisterScreen({ navigation }) {
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Location */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="location-on"
               size={22}
@@ -167,13 +130,13 @@ export default function RegisterScreen({ navigation }) {
               placeholder="Location"
               value={location}
               onChangeText={setLocation}
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Password */}
-          <View style={inputContainerStyle}>
+          <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
               name="lock-outline"
               size={22}
@@ -185,53 +148,27 @@ export default function RegisterScreen({ navigation }) {
               secureTextEntry
               value={password}
               onChangeText={setPassword}
-              style={inputStyle}
+              className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
           </View>
           
           {/* Role Selection */}
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            marginVertical: 24,
-          }}>
+          <View className="flex-row justify-center my-6">
             <TouchableOpacity
               onPress={() => setRole('worker')}
-              style={{
-                borderWidth: 1,
-                borderRadius: 24,
-                paddingVertical: 10,
-                paddingHorizontal: 24,
-                marginHorizontal: 8,
-                borderColor: role === 'worker' ? PURPLE : LIGHT_GRAY,
-                backgroundColor: 'white'
-              }}
+              className={`border rounded-full py-2.5 px-6 mx-2 bg-white ${role === 'worker' ? 'border-[#613DC1]' : 'border-[#e5e7eb]'}`}
             >
-              <Text style={{ 
-                color: role === 'worker' ? PURPLE : GRAY,
-                fontWeight: role === 'worker' ? '500' : 'normal'
-              }}>
+              <Text className={`${role === 'worker' ? 'text-[#613DC1] font-medium' : 'text-[#64748B]'}`}>
                 Worker
               </Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               onPress={() => setRole('employer')}
-              style={{
-                borderWidth: 1,
-                borderRadius: 24,
-                paddingVertical: 10,
-                paddingHorizontal: 24,
-                marginHorizontal: 8,
-                borderColor: role === 'employer' ? PURPLE : LIGHT_GRAY,
-                backgroundColor: 'white'
-              }}
+              className={`border rounded-full py-2.5 px-6 mx-2 bg-white ${role === 'employer' ? 'border-[#613DC1]' : 'border-[#e5e7eb]'}`}
             >
-              <Text style={{ 
-                color: role === 'employer' ? PURPLE : GRAY,
-                fontWeight: role === 'employer' ? '500' : 'normal'
-              }}>
+              <Text className={`${role === 'employer' ? 'text-[#613DC1] font-medium' : 'text-[#64748B]'}`}>
                 Employer
               </Text>
             </TouchableOpacity>
@@ -240,33 +177,18 @@ export default function RegisterScreen({ navigation }) {
           {/* Register Button */}
           <TouchableOpacity
             onPress={handleRegister}
-            style={{
-              backgroundColor: PURPLE,
-              borderRadius: 28,
-              paddingVertical: 16,
-              marginVertical: 16
-            }}
+            className="bg-[#613DC1] rounded-full py-4 my-4"
           >
-            <Text style={{ 
-              color: 'white', 
-              textAlign: 'center', 
-              fontWeight: '500', 
-              fontSize: 16 
-            }}>
+            <Text className="text-white text-center font-medium text-base">
               Register
             </Text>
           </TouchableOpacity>
           
           {/* Login Link */}
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'center', 
-            marginTop: 20,
-            marginBottom: 40
-          }}>
-            <Text style={{ color: GRAY, fontSize: 15 }}>Already have an account? </Text>
+          <View className="flex-row justify-center mt-5 mb-10">
+            <Text className="text-[#64748B] text-[15px]">Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={{ color: PURPLE, fontWeight: '500', fontSize: 15 }}>Login</Text>
+              <Text className="text-[#613DC1] font-medium text-[15px]">Login</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -274,22 +196,3 @@ export default function RegisterScreen({ navigation }) {
     </View>
   );
 }
-
-// Styles
-const inputContainerStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: 'white',
-  borderRadius: 30,
-  paddingHorizontal: 16,
-  marginBottom: 12,
-  borderWidth: 1,
-  borderColor: '#e5e7eb',
-  height: 56
-};
-
-const inputStyle = {
-  flex: 1,
-  paddingVertical: 12,
-  color: '#333'
-};
