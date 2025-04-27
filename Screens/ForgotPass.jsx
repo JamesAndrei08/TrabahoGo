@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { FIREBASE_AUTH } from '../backend/FirebaseConfig';
+import { View, Text, TextInput, TouchableOpacity, Alert, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { FIREBASE_AUTH } from '../backend/FirebaseConfig'; 
 import { resetUserPassword } from '../backend/resetpassword';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 export default function ForgotPass({ navigation }) {
   const [email, setEmail] = useState('');
@@ -28,7 +29,8 @@ export default function ForgotPass({ navigation }) {
   };
 
   return (
-    <View className="flex-1 bg-white px-6 pt-12">
+    <SafeAreaView behavior={Platform.OS === "ios" ? "padding" : "height" || Platform.OS === "android" ? "padding" : "height"} className="flex-1 bg-white px-6 pt-12">
+      <StatusBar barStyle="dark-content" backgroundColor='white' />
       {/* Back button */}
       <TouchableOpacity 
         onPress={goBack}
@@ -66,6 +68,6 @@ export default function ForgotPass({ navigation }) {
           <Text className="text-white font-medium text-base">Send Reset Link</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

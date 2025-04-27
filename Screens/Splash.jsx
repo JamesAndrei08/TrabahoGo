@@ -1,7 +1,7 @@
 import { View, Image, Animated, Easing } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 
-const SplashScreen = ({ navigation }) => {
+export default function SplashScreen ({ navigation }) {
     const fadeAnim = useRef(new Animated.Value(1)).current; 
 
     useEffect(() => {
@@ -27,4 +27,3 @@ const SplashScreen = ({ navigation }) => {
     );
 };
 
-export default SplashScreen;

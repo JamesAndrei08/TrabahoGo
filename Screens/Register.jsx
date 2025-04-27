@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, SafeAreaView, ScrollView, StatusBar
+import { View, TextInput, Text, TouchableOpacity, Platform, ScrollView, StatusBar, KeyboardAvoidingView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { registerUser } from '../backend/firebaseAuth';
@@ -16,8 +16,6 @@ export default function RegisterScreen() {
   const [location, setLocation] = useState('');
   
   const PURPLE = '#613DC1';
-  const GRAY = '#64748B';
-  const LIGHT_GRAY = '#e5e7eb';
 
   const handleRegister = async () => {
     if (!role) {
@@ -34,10 +32,10 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#613DC1]">
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height" || Platform.OS === "android" ? "padding" : "height"} className="flex-1 bg-[#613DC1]">
       <StatusBar barStyle="light-content" backgroundColor={PURPLE} />
    
-      <View className="px-10 pt-[70px] pb-[50px]">
+      <View className="px-10 pt-[70px] pb-[50px] mt-6">
         <Text className="text-white text-[28px] font-bold leading-9">
           Go ahead and create
         </Text>
@@ -46,8 +44,8 @@ export default function RegisterScreen() {
         </Text>
       </View>
       
-      <View className="flex-1 bg-white rounded-t-3xl px-8 pt-8 shadow-md">
-        <ScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height" || Platform.OS === "android" ? "padding" : "height"} className="flex-1 bg-white rounded-t-3xl px-8 pt-8 shadow-md">
+        <ScrollView>
           {/* First Name */}
           <View className="flex-row items-center bg-white rounded-full px-4 mb-3 border border-[#e5e7eb] h-14">
             <Icon
@@ -111,8 +109,13 @@ export default function RegisterScreen() {
             <TextInput
               placeholder="Cellphone Number"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(text) => {
+                // Only allow numbers
+                const numericText = text.replace(/[^0-9]/g, '');
+                setPhone(numericText);
+              }}
               keyboardType="phone-pad"
+              maxLength={11}
               className="flex-1 py-3 text-gray-800"
               placeholderTextColor="#9ca3af"
             />
@@ -187,12 +190,17 @@ export default function RegisterScreen() {
           {/* Login Link */}
           <View className="flex-row justify-center mt-5 mb-10">
             <Text className="text-[#64748B] text-[15px]">Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity onPress={() => 
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }], 
+              })
+            }>
               <Text className="text-[#613DC1] font-medium text-[15px]">Login</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </View>
-    </View>
+          </ScrollView>
+      </KeyboardAvoidingView>
+    </KeyboardAvoidingView>
   );
 }

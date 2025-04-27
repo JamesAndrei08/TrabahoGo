@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, StatusBar, Button } from 'react-native'
 import React from 'react'
 import { Ionicons } from "@expo/vector-icons";
 
-const Splash2 = ({ navigation }) => {
+export default function Splash2 ({ navigation }) {
   return (
     <View className="flex-1 bg-white">
       <View className="items-center justify-top">
@@ -17,11 +17,10 @@ const Splash2 = ({ navigation }) => {
           name="arrow-forward-circle-outline" 
           size={80} 
           color="#613DC1" 
-          onPress={() => navigation.replace("Login")} // dapat sa get started
+          onPress={() => navigation.replace("Register")} // dapat sa get started
           />
       </View>
     </View>
   )
 }
 
-export default Splash2

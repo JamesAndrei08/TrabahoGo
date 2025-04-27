@@ -6,17 +6,8 @@ import { signOut } from 'firebase/auth';
 export default function Welcome({ route, navigation }) {
   const { firstName, lastName, email } = route.params;
 
-  const handleLogout = async () => {
-    try {
-      await signOut(FIREBASE_AUTH);
-      navigation.replace('Login'); // Go back to login screen
-    } catch (error) {
-      alert('Logout Error: ' + error.message);
-    }
-  };
-
   const handleProfile = () => {
-    navigation.navigate('Profile'); // Navigate to Profile screen
+    navigation.navigate('Profile'); 
   };
 
   return (
