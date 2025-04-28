@@ -256,7 +256,7 @@ export default function Profile({ navigation }) {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
       
       <ScrollView className="flex-1">
         {loading ? (
