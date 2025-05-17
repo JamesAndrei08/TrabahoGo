@@ -143,6 +143,30 @@ export default function Profile({ navigation }) {
     Alert.alert('Settings', 'Application settings functionality will be implemented here.');
   };
 
+  // Navigation functions for bottom tabs
+  const navigateToJobs = () => {
+    // Navigate to appropriate screen based on user role and pass user data as params
+    if (userData.role === 'worker') {
+      navigation.navigate('Worker', {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email
+      });
+    } else {
+      navigation.navigate('Employer'); // Assuming Employer screen exists
+    }
+  };
+
+  const navigateToMessages = () => {
+    // Placeholder for Messages screen
+    Alert.alert('Messages', 'Messages screen will be implemented soon.');
+  };
+
+  const navigateToApplied = () => {
+    // Placeholder for Applied screen
+    Alert.alert('Applied', 'Applied screen will be implemented soon.');
+  };
+
   if (isEditing) {
     return (
       <View className="flex-1 bg-[#613DC1]">
@@ -258,15 +282,15 @@ export default function Profile({ navigation }) {
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="light-content" />
       
-      <ScrollView className="flex-1">
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingTop: 20 }}>
         {loading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#613DC1" />
           </View>
         ) : (
           <>
-            {/* Account Title */}
-            <Text className="text-[#613DC1] text-4xl font-bold px-5 py-3 mb-4">Account</Text>
+            {/* Account Title - Lower position */}
+            <Text className="text-[#613DC1] text-4xl font-bold px-5 pt-10 pb-3 mb-4">Account</Text>
             
             {/* Profile Info Section */}
             <View className="flex-row px-5 mb-5">
@@ -371,6 +395,51 @@ export default function Profile({ navigation }) {
           </>
         )}
       </ScrollView>
+      
+      {/* Bottom Navigation Bar */}
+      <View style={{ 
+        flexDirection: 'row', 
+        justifyContent: 'space-around', 
+        backgroundColor: '#7e22ce', 
+        paddingVertical: 12,
+      }}>
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={navigateToJobs}
+        >
+          <Icon name="work" size={24} color="rgba(255,255,255,0.7)" />
+          <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Jobs</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={navigateToMessages}
+        >
+          <Icon name="description" size={24} color="rgba(255,255,255,0.7)" />
+          <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Messages</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={navigateToApplied}
+        >
+          <Icon name="check-circle" size={24} color="rgba(255,255,255,0.7)" />
+          <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Applied</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={{ alignItems: 'center' }}>
+          <Icon name="person" size={24} color="white" />
+          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>Profile</Text>
+          {/* Active indicator */}
+          <View style={{ 
+            position: 'absolute', 
+            top: -12, 
+            height: 3, 
+            width: '100%', 
+            backgroundColor: 'white',
+          }} />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
